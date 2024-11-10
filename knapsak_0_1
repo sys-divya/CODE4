@@ -1,0 +1,97 @@
+class Item:
+    def __init__(self, value, weight):
+        self.value = value
+        self.weight = weight
+        self.ratio = value / weight  # Value-to-weight ratio
+
+def bound(node, capacity, total_value, items):
+    if node[2] >= capacity:  # Check weight from the tuple
+        return 0
+    value_bound = total_value
+    j = node[1] + 1  # Use index from tuple
+    total_weight = node[2]  # Weight from the tuple
+
+    while j < len(items) and total_weight + items[j].weight <= capacity:
+        total_weight += items[j].weight
+        value_bound += items[j].value
+        j += 1
+
+    if j < len(items):
+        value_bound += (capacity - total_weight) * items[j].ratio
+
+    return value_bound
+
+def knapsack(capacity, items):
+    items.sort(key=lambda x: x.ratio, reverse=True)
+    max_value = 0
+    queue = [(0, -1, 0)]  # (profit, index, weight)
+
+    while queue:
+        profit, index, weight = queue.pop(0)
+        if profit > max_value:
+            max_value = profit
+        if index + 1 < len(items):
+            next_index = index + 1
+            # Include next item
+            if weight + items[next_index].weight <= capacity:
+                queue.append((profit + items[next_index].value, next_index, weight + items[next_index].weight))
+            # Exclude next item
+            queue.append((profit, next_index, weight))
+            # Check bound
+            if bound((next_index, profit, weight), capacity, profit, items) > max_value:
+                queue.append((profit + items[next_index].value, next_index, weight + items[next_index].weight))
+
+    return max_value
+
+# Dynamic input
+if __name__ == "__main__":
+    capacity = int(input("Enter the capacity of the knapsack: "))
+    n = int(input("Enter the number of items: "))
+    items = []
+
+    for i in range(n):
+        value = int(input(f"Enter the value of item {i + 1}: "))
+        weight = int(input(f"Enter the weight of item {i + 1}: "))
+        items.append(Item(value, weight))
+
+    max_value = knapsack(capacity, items)
+    print(f"Maximum value in 0-1 Knapsack (Branch and Bound) = {max_value}")
+
+
+
+
+
+
+
+def knapsack_dp(weights, values, capacity):
+    n = len(values)
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+
+    for i in range(1, n + 1):
+        for w in range(1, capacity + 1):
+            if weights[i - 1] <= w:
+                dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - weights[i - 1]] + values[i - 1])
+            else:
+                dp[i][w] = dp[i - 1][w]
+
+    return dp[n][capacity]
+
+# Example usage with dynamic input
+if __name__ == "__main__":
+    capacity = int(input("Enter the capacity of the knapsack: "))
+    n = int(input("Enter the number of items: "))
+    weights = []
+    values = []
+
+    for i in range(n):
+        value = int(input(f"Enter the value of item {i + 1}: "))
+        weight = int(input(f"Enter the weight of item {i + 1}: "))
+        values.append(value)
+        weights.append(weight)
+
+    max_value = knapsack_dp(weights, values, capacity)
+    print(f"Maximum value in 0-1 Knapsack (DP) = {max_value}")
+
+
+
+    
