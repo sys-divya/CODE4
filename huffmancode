@@ -1,0 +1,42 @@
+import heapq
+from collections import Counter
+# Huffman encoding function
+def huffman_encoding(text):
+    if not text:  # Handle empty string case
+        return "", {}
+    # Count frequency of each character
+    heap = [[wt, [ch, ""]] for ch, wt in Counter(text).items()]
+    heapq.heapify(heap)
+    # Build the Huffman Tree
+    while len(heap) > 1:
+        lo = heapq.heappop(heap)
+        hi = heapq.heappop(heap)
+        for pair in lo[1:]:
+            pair[1] = '0' + pair[1]
+        for pair in hi[1:]:
+            pair[1] = '1' + pair[1]
+        heapq.heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
+    # Generate the Huffman codes
+    huff_dict = dict(sorted(heapq.heappop(heap)[1:], key=lambda p: (len(p[-1]), p)))
+    return ''.join(huff_dict[ch] for ch in text), huff_dict
+# Function to display the Huffman Codes and Encoded string
+def display_output(text, encoded, codes):
+    print("\nHuffman Encoding Result\n" + "="*25)
+    print(f"Input Text: {text}")
+    print("\nCharacter Codes:")
+    print("-" * 25)
+    for char, code in codes.items():
+        print(f"'{char}': {code}")
+    print("\nEncoded String:")
+    print(encoded)
+# Main function for dynamic input
+if __name__ == "__main__":
+    text = input("Enter the text to encode: ")
+    encoded, codes = huffman_encoding(text)
+    display_output(text, encoded, codes)
+
+
+
+
+
+
